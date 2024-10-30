@@ -26,14 +26,7 @@ export const useJournal = () => {
 export const JournalProvider: React.FC<{ children: ReactNode }> = ({
     children,
 }) => {
-    const [messages, setMessages] = useState<Message[]>(() => {
-        const storedMessages = localStorage.getItem("journalMessages");
-        return storedMessages ? JSON.parse(storedMessages) : [];
-    });
-
-    const saveToLocalStorage = (newMessages: Message[]) => {
-        localStorage.setItem("journalMessages", JSON.stringify(newMessages));
-    };
+    const [messages, setMessages] = useState<Message[]>([]);
 
     const createMessage = (content: string, password: string) => {
         const encryptedContent = CryptoJS.AES.encrypt(
@@ -44,9 +37,7 @@ export const JournalProvider: React.FC<{ children: ReactNode }> = ({
             id: Date.now().toString(),
             content: encryptedContent,
         };
-        const updatedMessages = [...messages, newMessage];
-        setMessages(updatedMessages);
-        saveToLocalStorage(updatedMessages);
+        setMessages([...messages, newMessage]);
     };
 
     const updateMessage = (id: string, content: string, password: string) => {
@@ -54,17 +45,15 @@ export const JournalProvider: React.FC<{ children: ReactNode }> = ({
             content,
             password
         ).toString();
-        const updatedMessages = messages.map((msg) =>
-            msg.id === id ? { ...msg, content: encryptedContent } : msg
+        setMessages(
+            messages.map((msg) =>
+                msg.id === id ? { ...msg, content: encryptedContent } : msg
+            )
         );
-        setMessages(updatedMessages);
-        saveToLocalStorage(updatedMessages);
     };
 
     const deleteMessage = (id: string) => {
-        const updatedMessages = messages.filter((msg) => msg.id !== id);
-        setMessages(updatedMessages);
-        saveToLocalStorage(updatedMessages);
+        setMessages(messages.filter((msg) => msg.id !== id));
     };
 
     const decryptMessage = (id: string, password: string) => {
@@ -92,3 +81,5 @@ export const JournalProvider: React.FC<{ children: ReactNode }> = ({
         </JournalContext.Provider>
     );
 };
+
+export default JournalProvider;

@@ -1,40 +1,33 @@
 import React, { useState } from "react";
 import { useJournal } from "../../utils/JournalContext";
 import { Message } from "../Message";
+import { PasswordInput } from "../../components/PasswordInput";
 
 const Journal: React.FC = () => {
     const { createMessage } = useJournal();
     const [content, setContent] = useState("");
-    const [password, setPassword] = useState("");
 
-    const handleCreate = () => {
+    const handleCreate = (password: string) => {
         if (content && password) {
             createMessage(content, password);
             setContent("");
-            setPassword("");
         }
     };
 
     return (
-        <div>
-            <h1>Mon Journal Intime</h1>
-            <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Écrire un nouveau message..."
-            />
-            <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Mot de passe"
-            />
-            <button onClick={handleCreate}>Créer le message</button>
-
-            <div>
-                <h2>Messages</h2>
-                <MessageList />
+        <div className="container mt-5">
+            <h1 className="text-center mb-4">Mon Journal Intime</h1>
+            <div className="mb-4">
+                <textarea
+                    className="form-control mb-2"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Écrire un nouveau message..."
+                />
+                <PasswordInput onPasswordSubmit={handleCreate} />
             </div>
+            <h2>Messages</h2>
+            <MessageList />
         </div>
     );
 };
@@ -42,9 +35,8 @@ const Journal: React.FC = () => {
 const MessageList: React.FC = () => {
     const { messages } = useJournal();
 
-    console.log(messages);
     return (
-        <div>
+        <div className="mt-4">
             {messages.map((message) => (
                 <Message key={message.id} id={message.id} />
             ))}
